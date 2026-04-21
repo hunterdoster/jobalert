@@ -2,7 +2,7 @@
 
 A self-hosted job monitoring dashboard that scrapes career sites on a schedule, detects new matching roles, and sends email alerts. Built with Python, FastAPI, and Playwright.
 
-**Live demo:** [your-app.railway.app](https://your-app.railway.app)
+**Live demo:** [jobalert-production.up.railway.app](https://jobalert-production.up.railway.app)
 
 ---
 
