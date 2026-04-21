@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Monitors — JobAlert{% endblock %}
+{% block content %}
+
+<div class="px-8 py-6">
+
+  <div class="flex items-start justify-between mb-6">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Monitors</h1>
+      <p class="text-slate-500 text-sm mt-1">Each monitor scrapes a different career site on a 2-hour interval.</p>
+    </div>
+    <button disabled
+      title="Disabled in demo mode"
+      class="flex items-center gap-2 bg-slate-100 text-slate-400 text-sm font-medium px-4 py-2 rounded-lg cursor-not-allowed">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Add Monitor
+      <span class="text-xs bg-amber-100 text-amber-600 px-1.5 py-0.5 rounded">Demo</span>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 gap-6">
+    {% for s in stats %}
+    {% set m = s.monitor %}
+    {% set colors = {
+      'blue':  {'border': 'border-blue-200', 'icon': 'bg-blue-600', 'badge': 'bg-blue-100 text-blue-700', 'keyword': 'bg-blue-50 text-blue-700 border-blue-200'},
+      'green': {'border': 'border-green-200', 'icon': 'bg-green-600', 'badge': 'bg-green-100 text-green-700', 'keyword': 'bg-green-50 text-green-700 border-green-200'},
+      'rose':  {'border': 'border-rose-200',  'icon': 'bg-rose-600',  'badge': 'bg-rose-100 text-rose-700',   'keyword': 'bg-rose-50 text-rose-700 border-rose-200'},
+    } %}
+    {% set c = colors.get(m.color, colors['blue']) %}
+
+    <div class="bg-white rounded-xl border {{ c.border }} shadow-sm p-6">
+      <div class="flex items-start justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-11 h-11 {{ c.icon }} rounded-xl flex items-center justify-center flex-shrink-0">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <div>
+            <h3 class="font-semibold text-slate-900 text-base">{{ m.company }}</h3>
+            <p class="text-sm text-slate-500">{{ m.name }}</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="inline-flex items-center gap-1.5 text-xs font-medium px-2.5 py-1 rounded-full {{ c.badge }}">
+            <span class="w-1.5 h-1.5 rounded-full bg-current"></span>
+            {% if m.is_active %}Active{% else %}Paused{% endif %}
+          </span>
+          <button disabled title="Disabled in demo mode"
+            class="text-xs text-slate-300 border border-slate-200 px-3 py-1.5 rounded-lg cursor-not-allowed">
+            Edit
+          </button>
+        </div>
+      </div>
+
+      <!-- Details grid -->
+      <div class="grid grid-cols-4 gap-4 mt-5 pt-5 border-t border-slate-100">
+        <div>
+          <p class="text-xs text-slate-400 mb-1">Scraper Type</p>
+          <p class="text-sm font-medium text-slate-700">{{ scraper_labels.get(m.scraper_type, m.scraper_type) }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 mb-1">Last Run</p>
+          <p class="text-sm font-medium text-slate-700">{{ s.last_run_ago }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 mb-1">Total Roles Found</p>
+          <p class="text-sm font-medium text-slate-700">{{ s.total_found }}</p>
+        </div>
+        <div>
+          <p class="text-xs text-slate-400 mb-1">Last Run Stats</p>
+          {% if s.last_log %}
+          <p class="text-sm font-medium text-slate-700">
+            {{ s.last_log.jobs_scraped }} scraped → {{ s.last_log.jobs_matched }} matched
+          </p>
+          {% else %}
+          <p class="text-sm text-slate-400">No runs yet</p>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Target URL -->
+      <div class="mt-4">
+        <p class="text-xs text-slate-400 mb-1">Target URL</p>
+        <a href="{{ m.target_url }}" target="_blank"
+          class="text-sm text-indigo-600 hover:text-indigo-800 font-mono break-all">{{ m.target_url }}</a>
+      </div>
+
+      <!-- Keywords -->
+      <div class="mt-4">
+        <p class="text-xs text-slate-400 mb-2">Keywords (title match)</p>
+        <div class="flex flex-wrap gap-2">
+          {% for kw in s.keywords %}
+          <span class="text-xs font-medium px-2.5 py-1 rounded-full border {{ c.keyword }}">{{ kw }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Architecture note -->
+  <div class="mt-6 bg-slate-50 border border-slate-200 rounded-xl p-5">
+    <h3 class="text-sm font-semibold text-slate-700 mb-2">How it works</h3>
+    <div class="grid grid-cols-3 gap-4 text-sm text-slate-600">
+      <div>
+        <p class="font-medium text-slate-700 mb-1">Zillow — Workday API</p>
+        <p class="text-xs">Direct POST to Workday's JSON endpoint. No browser needed. ~181 listings, paginated 20/page.</p>
+      </div>
+      <div>
+        <p class="font-medium text-slate-700 mb-1">Google — Playwright</p>
+        <p class="text-xs">Headless Chromium renders the Google Careers SPA. Filters by <code class="bg-slate-200 px-1 rounded">has_remote=true</code>. ~69 listings.</p>
+      </div>
+      <div>
+        <p class="font-medium text-slate-700 mb-1">Airbnb — Playwright</p>
+        <p class="text-xs">Scrapes all 238 positions, filters client-side for "Live and Work Anywhere" + US locations.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
