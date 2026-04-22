@@ -23,18 +23,38 @@
     .nav-link:not(.active) { @apply text-indigo-200 hover:bg-indigo-700/50 hover:text-white; }
   </style>
 </head>
-<body class="h-full">
+<body class="h-full flex flex-col">
 
 <!-- Demo Mode Banner -->
-<div class="bg-amber-400 text-amber-900 text-center text-sm font-semibold py-2 px-4">
-  🎯 Demo Mode — Live data shown is pre-seeded sample data. No real scrapers are running.
-  <a href="https://github.com/hunterdoster/jobalert" target="_blank" class="underline ml-2 hover:text-amber-700">View Source on GitHub →</a>
+<div class="bg-amber-400 text-amber-900 text-center text-sm font-semibold py-2 px-4 flex-shrink-0">
+  🎯 Demo Mode — pre-seeded sample data. No real scrapers running.
+  <a href="https://github.com/hunterdoster/jobalert" target="_blank" class="underline ml-2 hover:text-amber-700">View Source →</a>
 </div>
 
-<div class="flex h-[calc(100vh-36px)]">
+<!-- Mobile header -->
+<div class="md:hidden bg-indigo-800 flex items-center justify-between px-4 py-3 flex-shrink-0">
+  <div class="flex items-center gap-2">
+    <div class="w-7 h-7 bg-indigo-400 rounded-lg flex items-center justify-center">
+      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+      </svg>
+    </div>
+    <span class="text-white font-bold text-base">JobAlert</span>
+  </div>
+  <button id="sidebar-toggle" class="text-indigo-200 hover:text-white p-1 rounded-lg hover:bg-indigo-700">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+    </svg>
+  </button>
+</div>
+
+<!-- Sidebar overlay -->
+<div id="sidebar-overlay" class="fixed inset-0 bg-black/50 z-40 hidden md:hidden"></div>
+
+<div class="flex flex-1 overflow-hidden">
 
   <!-- Sidebar -->
-  <aside class="w-64 bg-indigo-800 flex flex-col flex-shrink-0">
+  <aside id="sidebar" class="fixed md:static top-0 left-0 bottom-0 z-50 w-64 bg-indigo-800 flex flex-col flex-shrink-0 -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out">
     <!-- Logo -->
     <div class="px-6 py-5 border-b border-indigo-700">
       <div class="flex items-center gap-2">
@@ -101,6 +121,32 @@
     {% block content %}{% endblock %}
   </main>
 </div>
+
+<script>
+  const toggle = document.getElementById('sidebar-toggle');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  function openSidebar() {
+    sidebar.classList.remove('-translate-x-full');
+    overlay.classList.remove('hidden');
+  }
+  function closeSidebar() {
+    sidebar.classList.add('-translate-x-full');
+    overlay.classList.add('hidden');
+  }
+
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      sidebar.classList.contains('-translate-x-full') ? openSidebar() : closeSidebar();
+    });
+  }
+  overlay.addEventListener('click', closeSidebar);
+
+  document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', closeSidebar);
+  });
+</script>
 
 </body>
 </html>

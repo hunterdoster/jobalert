@@ -2,9 +2,9 @@
 {% block title %}Monitors — JobAlert{% endblock %}
 {% block content %}
 
-<div class="px-8 py-6">
+<div class="px-4 py-4 sm:px-8 sm:py-6">
 
-  <div class="flex items-start justify-between mb-6">
+  <div class="flex flex-wrap items-start justify-between gap-3 mb-6">
     <div>
       <h1 class="text-2xl font-bold text-slate-900">Monitors</h1>
       <p class="text-slate-500 text-sm mt-1">Each monitor scrapes a different career site on a 2-hour interval.</p>
@@ -57,7 +57,7 @@
       </div>
 
       <!-- Details grid -->
-      <div class="grid grid-cols-4 gap-4 mt-5 pt-5 border-t border-slate-100">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-5 pt-5 border-t border-slate-100">
         <div>
           <p class="text-xs text-slate-400 mb-1">Scraper Type</p>
           <p class="text-sm font-medium text-slate-700">{{ scraper_labels.get(m.scraper_type, m.scraper_type) }}</p>
@@ -105,7 +105,7 @@
   <!-- Architecture note -->
   <div class="mt-6 bg-slate-50 border border-slate-200 rounded-xl p-5">
     <h3 class="text-sm font-semibold text-slate-700 mb-2">How it works</h3>
-    <div class="grid grid-cols-3 gap-4 text-sm text-slate-600">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-sm text-slate-600">
       <div>
         <p class="font-medium text-slate-700 mb-1">Zillow — Workday API</p>
         <p class="text-xs">Direct POST to Workday's JSON endpoint. No browser needed. ~181 listings, paginated 20/page.</p>
